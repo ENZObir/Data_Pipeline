@@ -1,0 +1,45 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.whl
+*.egg-info/
+.eggs/
+.python-version
+.env
+.env.*
+venv/
+.venv/
+pip-wheel-metadata/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+
+# Data outputs
+data/
+*.csv
+*.tsv
+*.parquet
+*.sqlite
+*.db
+
+# Docker
+.env.docker
+docker-compose.override.yml
+docker-data/
+docker-volumes/
+volumes/
+postgres_data/
+
+# Editor settings
+.vscode/
+.idea/
