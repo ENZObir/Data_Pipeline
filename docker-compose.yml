@@ -20,11 +20,25 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pipeline_network
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 
 networks:
   pipeline_network:
     driver: bridge
 
 volumes:
+  pgadmin-data:
+    name: pgadmin-data
   postgres_data:
     name: postgres_data
