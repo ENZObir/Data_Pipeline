@@ -20,7 +20,7 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pipeline_network
-    
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
@@ -32,6 +32,25 @@ services:
       PGADMIN_DEFAULT_PASSWORD: strong-password
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+
+  mlflow:
+    build: ./mlflow
+    container_name: mlflow_server
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_TRACKING_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    volumes:
+      - ./mlruns:/mlflow/artifacts
+    command: >
+      mlflow server 
+      --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+    networks:
+      - pipeline_network
+    depends_on:
+      - db
 
 networks:
   pipeline_network:
