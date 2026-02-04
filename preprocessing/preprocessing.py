@@ -17,9 +17,12 @@ def basic_cleanning(df):
     df.drop_duplicates()
     print(df.shape)
     print()
-    return df
+    return df 
 
 
+def main():
+    df = load_data()
+    df = basic_cleanning(df)
 
 
 
