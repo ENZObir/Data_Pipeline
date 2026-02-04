@@ -37,7 +37,7 @@ services:
     build: ./mlflow
     container_name: mlflow_server
     ports:
-      - "5000:5000"
+      - "5050:5000"
     environment:
       - MLFLOW_TRACKING_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
@@ -61,3 +61,12 @@ volumes:
     name: pgadmin-data
   postgres_data:
     name: postgres_data
+
+api:
+  build: ./api
+  container_name: api
+  ports:
+    - "8000:8000"
+  depends_on:
+    - postgres
+    - mlflow
