@@ -118,12 +118,12 @@ MLflow Model Registry:
   ├── iris_versicolor_model   # Specialized for Versicolor
   └── iris_virginica_model    # Specialized for Virginica
     
-**Why chunk by species?**
+Why chunk by species?
 - Different species may have different sepal length/width relationships
 - Enables species-specific model comparison
 - Potentially better model performance for known species
 - Demonstrates data partitioning and specialized modeling skills
-
+```
 
 ## 📁 Project Structure
 ```
@@ -154,7 +154,7 @@ curl -X POST http://localhost:5000/predict \
 **File:** `iris.csv` (150 samples)  
 **Columns:** `sepal_length` (target), `sepal_width` (feature), `petal_length`, `petal_width`, `species`
 
-⚠️ **Note:** Document shows duplicate column names (`petal length` / `petal.length`) - verify actual CSV structure.
+
 
 
 
