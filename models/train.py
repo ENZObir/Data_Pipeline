@@ -1,11 +1,29 @@
-from ast import mod
+import os
+from pathlib import Path
+
 import pandas as pd
 import mlflow
+import mlflow.sklearn
+from dotenv import load_dotenv
+from mlflow.tracking import MlflowClient
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
+ROOT_ENV = Path(__file__).resolve().parent.parent / ".env"
+if ROOT_ENV.exists():
+    load_dotenv(ROOT_ENV)
+
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
+MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME", "iris-training")
+MLFLOW_MODEL_NAME = os.getenv("MLFLOW_MODEL_NAME", "IrisModel")
+MLFLOW_MODEL_STAGE = os.getenv("MLFLOW_MODEL_STAGE", "Production")
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 
 
 df = pd.read_csv('./api/clean_iris.csv')
@@ -49,7 +67,7 @@ print(f"MAE : {mae_reg}")
 print(f"R² : {R2_reg}")
 
 
-with mlflow.start_run():
+with mlflow.start_run() as run:
     
     mlflow.sklearn.log_model(model_lr, "linear_regression")
     mlflow.sklearn.log_model(model_reg, "Random_forest")
@@ -81,6 +99,16 @@ with mlflow.start_run():
     model_result.to_csv('prediction.csv', index= False)
 
     mlflow.log_artifact('prediction.csv')
+
+    client = MlflowClient()
+    model_source = f"runs:/{run.info.run_id}/Random_forest"
+    registration = mlflow.register_model(model_source, MLFLOW_MODEL_NAME)
+    client.transition_model_version_stage(
+        name=MLFLOW_MODEL_NAME,
+        version=registration.version,
+        stage=MLFLOW_MODEL_STAGE,
+        archive_existing_versions=True,
+    )
 
 
 # Après le chargement

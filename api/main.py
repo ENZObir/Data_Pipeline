@@ -1,14 +1,25 @@
 from fastapi import FastAPI, HTTPException
 import pandas as pd
+import mlflow
 import mlflow.pyfunc
 import psycopg2
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+ROOT_ENV = Path(__file__).resolve().parent.parent / ".env"
+if ROOT_ENV.exists():
+    load_dotenv(ROOT_ENV)
 
 # ===============================
 # CONFIG
 # ===============================
 
-MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH", None)
+DEFAULT_MODEL_URI = os.getenv("MLFLOW_MODEL_URI", "models:/IrisModel/Production")
+MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH", DEFAULT_MODEL_URI)
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
 POSTGRES_HOST = "postgres"   # IMPORTANT: nom du service docker
 POSTGRES_PORT = 5432

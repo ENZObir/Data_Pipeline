@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:15
@@ -19,6 +17,12 @@ services:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pipeline_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   preprocessing:
     image: python:3.10-slim
@@ -29,8 +33,11 @@ services:
       - ./:/app
     env_file:
       - .env
+    environment:
+      POSTGRES_HOST: db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     command: >
       sh -c "pip install --no-cache-dir -r requirements.txt && python preprocessing/preprocessing.py"
     networks:
@@ -70,7 +77,8 @@ services:
     networks:
       - pipeline_network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   training:
     image: python:3.10-slim
@@ -83,10 +91,17 @@ services:
       - .env
     environment:
       MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-http://mlflow:5000}
+      POSTGRES_HOST: db
+      MLFLOW_EXPERIMENT_NAME: ${MLFLOW_EXPERIMENT_NAME:-iris-training}
+      MLFLOW_MODEL_NAME: ${MLFLOW_MODEL_NAME:-IrisModel}
+      MLFLOW_MODEL_STAGE: ${MLFLOW_MODEL_STAGE:-Production}
     depends_on:
-      - preprocessing
-      - db
-      - mlflow
+      preprocessing:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
     command: >
       sh -c "pip install --no-cache-dir -r requirements.txt && python models/train.py"
     networks:
@@ -103,9 +118,13 @@ services:
     environment:
       MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-http://mlflow:5000}
       MLFLOW_MODEL_URI: ${MLFLOW_MODEL_URI:-models:/IrisModel/production}
+      MLFLOW_MODEL_PATH: ${MLFLOW_MODEL_PATH:-models:/IrisModel/production}
+      POSTGRES_HOST: db
     depends_on:
-      - training
-      - mlflow
+      training:
+        condition: service_completed_successfully
+      mlflow:
+        condition: service_started
     networks:
       - pipeline_network
 
