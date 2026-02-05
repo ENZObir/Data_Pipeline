@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 COPY main.py /app/main.py
 
-RUN pip install --no-cache-dir fastapi uvicorn mlflow pandas scikit-learn
+RUN pip install --no-cache-dir fastapi uvicorn mlflow pandas scikit-learn psycopg2-binary
 
 EXPOSE 8000
 
