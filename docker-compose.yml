@@ -128,6 +128,16 @@ services:
     networks:
       - pipeline_network
 
+  ui:
+    build: ./ui
+    container_name: iris_ui
+    ports:
+      - "8080:80"
+    networks:
+      - pipeline_network
+    depends_on:
+      - api
+
 networks:
   pipeline_network:
     driver: bridge
