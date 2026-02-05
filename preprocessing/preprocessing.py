@@ -1,7 +1,5 @@
 import pandas as pd
 
-from models.Models import df
-
 
 def load_data():
     df = pd.read_csv('api/iris.csv')
@@ -24,8 +22,6 @@ def split_flower(df):
     return df_virginica, df_versicolor, df_setosa
 
 
-
-    
 
 def main():
     df = load_data()
