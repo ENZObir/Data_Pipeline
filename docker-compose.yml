@@ -120,6 +120,8 @@ services:
       MLFLOW_MODEL_URI: ${MLFLOW_MODEL_URI:-models:/IrisModel/production}
       MLFLOW_MODEL_PATH: ${MLFLOW_MODEL_PATH:-models:/IrisModel/production}
       POSTGRES_HOST: db
+    volumes:
+      - ./mlruns:/mlruns:ro
     depends_on:
       training:
         condition: service_completed_successfully

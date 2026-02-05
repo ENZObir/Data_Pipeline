@@ -1,37 +1,36 @@
 from fastapi import FastAPI, HTTPException
 import pandas as pd
-import mlflow
 import mlflow.pyfunc
 import psycopg2
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-ROOT_ENV = Path(__file__).resolve().parent.parent / ".env"
+# ===============================
+# LOAD ENV
+# ===============================
+ROOT_ENV = Path(__file__).parent.parent / ".env"
 if ROOT_ENV.exists():
     load_dotenv(ROOT_ENV)
 
 # ===============================
 # CONFIG
 # ===============================
-
-DEFAULT_MODEL_URI = os.getenv("MLFLOW_MODEL_URI", "models:/IrisModel/Production")
-MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH", DEFAULT_MODEL_URI)
+MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH")
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
-POSTGRES_HOST = "postgres"   # IMPORTANT: nom du service docker
-POSTGRES_PORT = 5432
-POSTGRES_DB = "postgres"
-POSTGRES_USER = "postgres"
-POSTGRES_PASSWORD = "postgres"
-
+# PostgreSQL config
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "db")
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", 5432))
+POSTGRES_DB = os.getenv("POSTGRES_DB", "postgres")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
 
 # ===============================
 # INIT API
 # ===============================
-
 app = FastAPI(
     title="Iris Predictor API",
     version="2.0"
@@ -39,43 +38,36 @@ app = FastAPI(
 
 model = None
 
-
 # ===============================
-# LOAD MODEL AU DEMARRAGE
+# LOAD MODEL AT STARTUP
 # ===============================
-
 @app.on_event("startup")
 def load_model():
     global model
 
     if not MLFLOW_MODEL_PATH:
-        print("⚠️ Aucun modèle MLflow défini")
+        print("⚠️ Aucun modèle MLflow défini dans .env")
         return
 
     try:
         model = mlflow.pyfunc.load_model(MLFLOW_MODEL_PATH)
-        print("✅ Modèle MLflow chargé")
+        print(f"✅ Modèle MLflow chargé depuis : {MLFLOW_MODEL_PATH}")
     except Exception as e:
         print("⚠️ Impossible de charger le modèle:", e)
         model = None
 
-
 # ===============================
-# FALLBACK MODEL
+# FALLBACK DUMMY MODEL
 # ===============================
-
 def dummy_model(width: float):
     return width * 2 + 1
-
 
 # ===============================
 # ROUTES
 # ===============================
-
 @app.get("/")
 def root():
     return {"message": "API running"}
-
 
 @app.get("/health")
 def health():
@@ -84,8 +76,6 @@ def health():
         "model_loaded": model is not None
     }
 
-
-# 🔥 ROUTE TEST POSTGRES (TEMPORAIRE)
 @app.get("/test-db")
 def test_db():
     try:
@@ -96,14 +86,17 @@ def test_db():
             user=POSTGRES_USER,
             password=POSTGRES_PASSWORD
         )
-
         conn.close()
-
         return {"db_connection": "OK"}
-
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/model-status")
+def model_status():
+    if model:
+        return {"status": "loaded", "model_path": MLFLOW_MODEL_PATH}
+    else:
+        return {"status": "not loaded"}
 
 @app.get("/predict")
 def predict(sepal_width: float):
