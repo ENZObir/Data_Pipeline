@@ -1,0 +1,23 @@
+artifact_path: /Users/enzob/Documents/Epitech/Data_Pipeline/mlruns/0/models/m-0ea862c58b8141038f6b82125a552f73/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.9.0
+model_id: m-0ea862c58b8141038f6b82125a552f73
+model_size_bytes: 315475
+model_uuid: m-0ea862c58b8141038f6b82125a552f73
+prompts: null
+run_id: fe7f74c5f41f4f859da691285a671fab
+utc_time_created: '2026-02-05 14:01:00.522842'

@@ -16,7 +16,7 @@ y = df['sepal_length']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model_lr = LinearRegression()
-mod.fit(X_train, y_train)
+model_lr.fit(X_train, y_train)
 
 y_pred_lr = model_lr.predict(X_test)
 
@@ -51,9 +51,24 @@ print(f"R² : {R2_reg}")
 
 with mlflow.start_run():
     
-    mlflow.log_param('Mean squared error (Linear regression)' , mse_lr),
+    mlflow.sklearn.log_model(model_lr, "linear_regression")
+    mlflow.sklearn.log_model(model_reg, "Random_forest")
 
-    mlflow.log_param('Mean squared error (Random Forest regression)' , mse_reg)
+    mlflow.log_metric('Mean_squared_error_Linear_regression' , mse_lr),
+
+    mlflow.log_metric('Mean_squared_error_Random_Forest_regression' , mse_reg)
+
+    mlflow.log_metric('Mean_absolute_error_Linear_regression' , mae_lr),
+
+    mlflow.log_metric('Mean_absolute_error_Random_Forest_regression' , mae_reg)
+
+    mlflow.log_metric('R_squared_Linear_regression' , R2_lr),
+
+    mlflow.log_metric('R_squared_Random_Forest_regression' , R2_reg)
+
+
+    mlflow.log_param("test_size", 0.2)
+    mlflow.log_param("random_state", 42)
 
     model_result = pd.DataFrame(
         {
@@ -66,3 +81,21 @@ with mlflow.start_run():
     model_result.to_csv('prediction.csv', index= False)
 
     mlflow.log_artifact('prediction.csv')
+
+
+# Après le chargement
+print(f"Dataset loaded succesfuly : {df.shape[0]} lignes, {df.shape[1]} colonnes")
+print(df.head())
+
+# Après le split
+print(f"Train : {X_train.shape[0]} samples | Test : {X_test.shape[0]} samples")
+
+# Après l'entraînement
+print(" LinearRegression model trained ✓")
+print("RandomForest model trained ✓")
+
+# Après les prédictions (juste quelques valeurs, pas tout)
+
+print(f"First real value : {y_test.values[:5]}")
+print(f"First predictions LR : {y_pred_lr[:5]}")
+print(f"First predictions REG : {y_pred_reg[:5]}")
