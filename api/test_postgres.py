@@ -1,7 +1,6 @@
 import psycopg2
 
-# PostgreSQL config
-POSTGRES_HOST = "localhost"   # <-- changé
+POSTGRES_HOST = "localhost" 
 POSTGRES_PORT = 5432
 POSTGRES_DB = "iris_db"
 POSTGRES_USER = "arthur_mcwalter_sperger"

@@ -91,13 +91,11 @@
 </head>
 <body>
 
-    <!-- Fleurs animées -->
     <div class="flower" style="left:10%; animation-delay:0s;"></div>
     <div class="flower" style="left:30%; animation-delay:2s;"></div>
     <div class="flower" style="left:60%; animation-delay:4s;"></div>
     <div class="flower" style="left:80%; animation-delay:6s;"></div>
 
-    <!-- Card principale -->
     <div class="container">
         <h1>Iris Sepal Predictor 🌸</h1>
         <input id="width" type="number" step="0.1" placeholder="Largeur du sépale">
@@ -115,7 +113,6 @@
                 return;
             }
 
-            // Call real API
             let prediction;
             try {
                 const response = await fetch(`http://localhost:8000/predict?sepal_width=${width}`);
@@ -123,15 +120,12 @@
                 const data = await response.json();
                 prediction = data.prediction ?? (data.sepal_length_pred ?? (width * 2 + 1));
             } catch (err) {
-                // Fallback to dummy on error
                 console.warn('API request failed, using dummy model:', err);
                 prediction = width * 2 + 1;
             }
 
             const resultEl = document.getElementById('result');
             resultEl.innerText = `Résultat : ${prediction.toFixed(2)} cm`;
-
-            // Animation micro-feedback
             resultEl.style.color = ['#ff69b4','#74ebd5','#ACB6E5','#ffb347'][Math.floor(Math.random()*4)];
             resultEl.style.transform = 'scale(1.2)';
             setTimeout(()=>{ resultEl.style.transform='scale(1)'; }, 300);

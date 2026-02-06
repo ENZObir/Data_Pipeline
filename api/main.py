@@ -7,39 +7,28 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# ===============================
-# LOAD ENV
-# ===============================
+
 ROOT_ENV = Path(__file__).parent.parent / ".env"
 if ROOT_ENV.exists():
     load_dotenv(ROOT_ENV)
 
-# ===============================
-# CONFIG
-# ===============================
 MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH")
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
-# PostgreSQL config
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "db")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", 5432))
 POSTGRES_DB = os.getenv("POSTGRES_DB", "postgres")
 POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
 
-# ===============================
-# INIT API
-# ===============================
 app = FastAPI(
     title="Iris Predictor API",
     version="2.0"
 )
 
 model = None
-
-# Allow UI (and other local clients) to call the API from the browser
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:8080"],
@@ -48,9 +37,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ===============================
-# LOAD MODEL AT STARTUP
-# ===============================
 @app.on_event("startup")
 def load_model():
     global model
@@ -66,15 +52,9 @@ def load_model():
         print("⚠️ Impossible de charger le modèle:", e)
         model = None
 
-# ===============================
-# FALLBACK DUMMY MODEL
-# ===============================
 def dummy_model(width: float):
     return width * 2 + 1
 
-# ===============================
-# ROUTES
-# ===============================
 @app.get("/")
 def root():
     return {"message": "API running"}
