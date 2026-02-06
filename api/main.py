@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
+import mlflow
 import mlflow.pyfunc
 import psycopg2
 import os
@@ -17,7 +18,8 @@ if ROOT_ENV.exists():
 # ===============================
 # CONFIG
 # ===============================
-MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH")
+DEFAULT_MODEL_URI = os.getenv("MLFLOW_MODEL_URI", "models:/IrisModel/Production")
+MLFLOW_MODEL_PATH = os.getenv("MLFLOW_MODEL_PATH", DEFAULT_MODEL_URI)
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)

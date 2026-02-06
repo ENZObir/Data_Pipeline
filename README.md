@@ -172,4 +172,13 @@ MLflow monitors: RMSE, MAE, R² Score
 
 [Docker](https://docs.docker.com/) • [MLflow](https://mlflow.org/docs/latest/) • [PostgreSQL](https://www.postgresql.org/docs/) • [Flask](https://flask.palletsprojects.com/) • [FastAPI](https://fastapi.tiangolo.com/) • [Scikit-learn](https://scikit-learn.org/stable/)
 
+## 🛠️ Troubleshooting
+
+- **Check container status**: `docker compose ps` verifies health/exit codes before digging into logs.
+- **Inspect preprocessing/training logs**: `docker compose logs preprocessing training --tail 100` confirms data landed in PostgreSQL before modeling starts.
+- **Validate database readiness**: `docker compose exec db pg_isready -U $POSTGRES_USER -d $POSTGRES_DB` mirrors the healthcheck used by the orchestrator.
+- **MLflow diagnostics**: `docker compose logs mlflow --tail 100` shows registry activity and artifact storage paths if the API cannot load a model.
+- **API errors**: `docker compose logs api --tail 100` surfaces FastAPI stack traces (e.g., missing model URI, validation issues).
+- **Persistent volumes**: `docker volume inspect datapipeline-docker-public_pgadmin-data` (replace with the volume name) confirms that PostgreSQL and MLflow data survive `docker compose down`.
+
 

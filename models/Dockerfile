@@ -2,8 +2,8 @@ FROM python:3.10-slim AS builder
 
 WORKDIR /deps
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/deps -r requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --prefix=/deps -r /tmp/requirements.txt
 
 FROM python:3.10-slim
 
@@ -15,6 +15,4 @@ WORKDIR /app
 COPY --from=builder /deps /usr/local
 COPY . /app
 
-EXPOSE 8000
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "models/train.py"]

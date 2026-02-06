@@ -26,7 +26,9 @@ mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 
 
-df = pd.read_csv('./api/clean_iris.csv')
+DATASET_PATH = os.getenv("TRAINING_DATASET_PATH", "./data/iris_clean.csv")
+
+df = pd.read_csv(DATASET_PATH)
 
 X = df[['sepal_width']]
 y = df['sepal_length']
