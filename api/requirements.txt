@@ -3,3 +3,4 @@ uvicorn
 pandas
 mlflow
 psycopg2-binary
+scikit-learn
