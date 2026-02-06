@@ -5,7 +5,7 @@ import mlflow
 
 def main() -> None:
     load_dotenv()
-    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5050")
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("Iris_Project")
 

@@ -2,6 +2,9 @@
 .DS_Store
 Thumbs.db
 
+*.env
+.env
+
 # Python
 __pycache__/
 *.py[cod]
@@ -11,8 +14,6 @@ __pycache__/
 *.egg-info/
 .eggs/
 .python-version
-.env
-.env.*
 venv/
 .venv/
 pip-wheel-metadata/
