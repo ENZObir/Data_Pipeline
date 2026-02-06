@@ -118,13 +118,18 @@
                 return;
             }
 
-            // Dummy calculation
-            let prediction = width * 2 + 1;
-
-            // Dès que l'API est prête, remplace la ligne ci-dessous par :
-            // const response = await fetch(`http://localhost:8000/predict?sepal_width=${width}`);
-            // const data = await response.json();
-            // let prediction = data.sepal_length_pred;
+            // Call real API
+            let prediction;
+            try {
+                const response = await fetch(`http://localhost:8000/predict?sepal_width=${width}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                prediction = data.prediction ?? (data.sepal_length_pred ?? (width * 2 + 1));
+            } catch (err) {
+                // Fallback to dummy on error
+                console.warn('API request failed, using dummy model:', err);
+                prediction = width * 2 + 1;
+            }
 
             const resultEl = document.getElementById('result');
             resultEl.innerText = `Résultat : ${prediction.toFixed(2)} cm`;

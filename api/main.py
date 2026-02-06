@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import mlflow.pyfunc
 import psycopg2
@@ -37,6 +38,15 @@ app = FastAPI(
 )
 
 model = None
+
+# Allow UI (and other local clients) to call the API from the browser
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 # ===============================
 # LOAD MODEL AT STARTUP
